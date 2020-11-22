@@ -1,6 +1,8 @@
 //variables to reference DOM elements to weite data into right side of page
 var repoContainerEl = document.querySelector("#repos-container");
 var repoSearchTerm = document.querySelector("#repo-search-term");
+var userFormEl = document.querySelector("#user-form");
+var nameInputEl = document.querySelector("#username");
 
 
 var getUserRepos = function(user) {
@@ -25,11 +27,6 @@ var getUserRepos = function(user) {
   });
 }
 
-//variables to store a reference to <form> el w/ id of user-form
-// and add to <input> el w/ id of username
-var userFormEl = document.querySelector("#user-form");
-var nameInputEl = document.querySelector("#username");
-
 //function to execute on form submission browser event
 var formSubmitHandler = function(event) {
     event.preventDefault();
@@ -46,8 +43,8 @@ console.log(event);
 };
 
 //function to accept both array of repo data & the search term as parameters
-  var displayRepos = function(repos, searchTerm) {
-      // check if api returned any repos
+var displayRepos = function(repos, searchTerm) {
+    // check if api returned any repos
     if (repos.length === 0) {
         repoContainerEl.textContent = "No repositories found.";
         return;
@@ -62,16 +59,14 @@ console.log(event);
         // format repo name
         var repoName = repos[i].owner.login + "/" + repos[i].name;
     
-        // create a container for each repo
-        var repoEl = document.createElement("div");
+        // create a link for each repo
+        var repoEl = document.createElement("a");
         repoEl.classList = "list-item flex-row justify-space-between align-center";
+        repoEl.setAttribute("href", "./single-repo.html?repo=" + repoName);
     
         // create a span element to hold repository name
         var titleEl = document.createElement("span");
         titleEl.textContent = repoName;
-    
-        // append to container
-        repoEl.appendChild(titleEl);
         
         // create a status element
         var statusEl = document.createElement("span");
@@ -86,12 +81,15 @@ console.log(event);
         }
 
         // append to container
+        repoEl.appendChild(titleEl);
+
+        // append to container
         repoEl.appendChild(statusEl);
 
         // append container to the dom
         repoContainerEl.appendChild(repoEl);
     }
-  };
+};
 
 
 //function call

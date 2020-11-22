@@ -2,27 +2,48 @@
 var issueContainerEl = document.querySelector("#issues-container");
 //DOM reference to limit warning container
 var limitWarningEl = document.querySelector("#limit-warning");
+//DOM reference to repo name by user
+var repoNameEl = document.querySelector("#repo-name");
+
+//function to link correct repo when loading single.html based on user
+var getRepoName = function() {
+    // grab repo name from url query string
+    var queryString = document.location.search;
+    var repoName = queryString.split("=")[1];
+  
+    if (repoName) {
+      // display repo name on the page
+      repoNameEl.textContent = repoName;
+  
+      getRepoIssues(repoName);
+    } else {
+      // if no repo was given, redirect to the homepage
+      document.location.replace("./index.html");
+    }
+  };
 
 //function to gather response for git issues
 var getRepoIssues = function(repo) {
     var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
 
+    // make a get request to url
     fetch(apiUrl).then(function(response) {
         // request was successful
         if (response.ok) {
             response.json().then(function(data) {
-              displayIssues(data);
-          
-              // check if api has paginated issues
-              if (response.headers.get("Link")) {
-                displayWarning(repo);
-              }
-            });
-          }
-        else {
-          alert("There was a problem with your request!");
+            displayIssues(data);
+  
+        // check if api has paginated issues
+        if (response.headers.get("Link")) {
+            displayWarning(repo);
         }
-      });
+         });
+        }    
+        else {
+         // if not successful, redirect to homepage
+        document.location.replace("./index.html");
+        }
+    });
   };
   
 //function that accepts parameter:issues
@@ -49,16 +70,17 @@ var displayIssues = function(issues) {
 
         // check if issue is an actual issue or a pull request
         if (issues[i].pull_request) {
-        typeEl.textContent = "(Pull request)";
-        } else {
-        typeEl.textContent = "(Issue)";
+            typeEl.textContent = "(Pull request)";
+        } 
+        else {
+            typeEl.textContent = "(Issue)";
         }
 
         // append to container
         issueEl.appendChild(typeEl);
 
         issueContainerEl.appendChild(issueEl);
-        }
+    }
 };
 
 //function w/ repo parameter
@@ -76,4 +98,4 @@ var displayWarning = function(repo) {
   };
 
   //function call
-  getRepoIssues("facebook/react");
+  getRepoName();
